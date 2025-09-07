@@ -7,6 +7,7 @@ const SocketContext = createContext<Socket | null>(null);
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 const [socket] = useState(() =>
   io("https://syncify-backend-yvq1.onrender.com", {
+  // io("http://localhost:3001", {
     transports: ["websocket"],
   })
 );
