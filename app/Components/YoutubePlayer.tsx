@@ -198,14 +198,7 @@ export default function YouTubePlayerQueue() {
     const videoId = queue[currentIndex].id
 
     function createOrLoad() {
-      if (playerRef.current && !showVideo) {
-        playerRef.current.destroy()
-        playerRef.current = null
-        lastLoadedId.current = null
-        return
-      }
-
-      if (!playerRef.current && showVideo) {
+      if (!playerRef.current) {
         const playerElement = document.getElementById("yt-player")
         if (!playerElement) return
 
@@ -237,11 +230,9 @@ export default function YouTubePlayerQueue() {
             },
           },
         })
-      } else if (playerRef.current && showVideo) {
-        if (lastLoadedId.current !== videoId) {
-          playerRef.current.loadVideoById(videoId)
-          lastLoadedId.current = videoId
-        }
+      } else if (playerRef.current && lastLoadedId.current !== videoId) {
+        playerRef.current.loadVideoById(videoId)
+        lastLoadedId.current = videoId
       }
     }
 
@@ -250,7 +241,7 @@ export default function YouTubePlayerQueue() {
     } else {
       ;(window as any).onYouTubeIframeAPIReady = createOrLoad
     }
-  }, [currentIndex, queue, volume, showVideo]) // Added showVideo dependency
+  }, [currentIndex, queue, volume])
 
   // playback controls
   const handlePlay = useCallback(() => {
@@ -415,13 +406,17 @@ export default function YouTubePlayerQueue() {
 
         {/* player */}
         <div className="relative w-full rounded-xl overflow-hidden bg-black/5">
-          {showVideo ? (
-            <div
-              id="yt-player"
-              className="w-full aspect-video transition-all duration-300"
-              style={{ minHeight: "315px" }}
-            />
-          ) : (
+          <div
+            className={`transition-all duration-300 ${
+              showVideo
+                ? "w-full aspect-video opacity-100 relative"
+                : "absolute -top-[1000px] -left-[1000px] w-full aspect-video opacity-0 pointer-events-none"
+            }`}
+          >
+            <div id="yt-player" className="w-full h-full" />
+          </div>
+
+          {!showVideo && (
             <div className="w-full h-16 flex items-center justify-center bg-black/10 rounded-xl">
               <div className="text-sm text-muted-foreground">
                 {currentIndex >= 0 ? "Playing in background..." : "No video selected"}
