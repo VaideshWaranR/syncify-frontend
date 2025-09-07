@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Socket } from "socket.io-client"
+import { useSocket } from "../Context/SocketContext"
 
 interface YouTubeVideo {
   id: string
@@ -24,7 +26,8 @@ export default function YouTubeSearch() {
   const [loading, setLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-
+  const socket=useSocket();
+  const [copied,setCopied]=useState(false)
   // Mock data for demonstration - used as fallback when API is not available
   const mockVideos: YouTubeVideo[] = [
     {
@@ -112,7 +115,12 @@ export default function YouTubeSearch() {
       setLoading(false)
     }
   }
-
+  const handleAddVideo = (id:string,title:string) => {
+    if(!socket) return false
+  socket.emit("add_from_search",{id,title});
+  return true;
+  }
+  
   const copyVideoSlug = async (videoId: string) => {
     try {
       await navigator.clipboard.writeText(videoId)
@@ -282,14 +290,15 @@ export default function YouTubeSearch() {
                     <p className="text-sm text-foreground/70 line-clamp-2 leading-relaxed">{video.description}</p>
 
                     <Button
-                      onClick={() => copyVideoSlug(video.id)}
+                      // onClick={() => copyVideoSlug(video.id)}
+                      onClick={()=>handleAddVideo(video.id,video.title)}
                       className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200 group/button"
                       size="sm"
                     >
-                      {copiedId === video.id ? (
+                      {copied ? (
                         <>
                           <Check className="h-4 w-4 mr-2 text-green-400" />
-                          <span className="text-green-100">Copied!</span>
+                          <span className="text-green-100">Added to Queue</span>
                         </>
                       ) : (
                         <>

@@ -26,16 +26,18 @@ interface UserInterfaceProps {
     setUsers:React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function UserInterface() {
+export default function UserInterface({props:setAdmin}: {props:React.Dispatch<React.SetStateAction<boolean>>}) {
   const [userName,setUserName]=useState("");
   const [roomName,setRoomName]=useState("");
   const [users,setUsers]=useState<string[]>([]);
 
   const handleCreateRoom=()=>{
-   socket.emit("create_room",{userName,roomName})
-   alert("Room Created Successfully")
+    setAdmin(true)
+    socket.emit("create_room",{userName,roomName})
+    alert("Room Created Successfully")
   }
   const handleJoinRoom=()=>{
+    setAdmin(false)
    socket.emit("join_room",{userName,roomName})
    alert("Room Joined Successfully")
   }

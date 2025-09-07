@@ -8,7 +8,7 @@ import { Play, Pause, Trash2, GripVertical } from "lucide-react"
 import { gsap } from "gsap"
 import { useSocket } from "../Context/SocketContext"
 
-export default function YouTubePlayerQueue() {
+export default function YouTubePlayerQueue({props:admin}:{props:boolean}) {
   const [queue, setQueue] = useState<{ id: string; title: string }[]>([])
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [showVideo, setShowVideo] = useState(false)
@@ -365,6 +365,9 @@ export default function YouTubePlayerQueue() {
             <Button onClick={handleNext} variant="default">
               Next ▶
             </Button>
+            {admin&&<Button variant="outline"
+            onClick={()=>socket.emit("sync_all",({currentTime:currentTime}))}>Sync Time</Button>
+            }
           </div>
 
           {/* progress + volume */}
